@@ -9,7 +9,9 @@
  * Chạy được cả trong Node (test) — localStorage/location được guard.
  */
 
-export type Lang = "vi" | "en";
+import { ES } from "./i18n-es.js"; // [fork:casa]
+
+export type Lang = "vi" | "en" | "es"; // [fork:casa] + es
 
 type Dict = Record<string, string>;
 
@@ -177,10 +179,11 @@ const EN: Dict = {
   "note.redo": "redo: {label}",
 };
 
-const DICTS: Record<Lang, Dict> = { vi: VI, en: EN };
+const DICTS: Record<Lang, Dict> = { vi: VI, en: EN, es: ES }; // [fork:casa] + es
 
 export const DICT_KEYS = Object.keys(VI);
 export const DICT_EN_KEYS = Object.keys(EN);
+export const DICT_ES_KEYS = Object.keys(ES); // [fork:casa]
 
 export type DetectInput = {
   /** ?lang trong URL. */
@@ -195,10 +198,11 @@ export type DetectInput = {
 
 /** Chọn ngôn ngữ — THUẦN, test được: tay (query > saved) thắng auto (VN → vi, ngoài → en). */
 export function detectLang(input: DetectInput): Lang {
-  if (input.query === "en" || input.query === "vi") return input.query;
-  if (input.saved === "en" || input.saved === "vi") return input.saved;
+  if (input.query === "en" || input.query === "vi" || input.query === "es") return input.query; // [fork:casa] + es
+  if (input.saved === "en" || input.saved === "vi" || input.saved === "es") return input.saved; // [fork:casa] + es
   if (input.timeZone === "Asia/Ho_Chi_Minh" || input.timeZone === "Asia/Saigon") return "vi";
   if (input.languages?.some((l) => l?.toLowerCase().startsWith("vi"))) return "vi";
+  if (input.languages?.[0]?.toLowerCase().startsWith("es")) return "es"; // [fork:casa] navegador en español
   return "en";
 }
 
@@ -206,7 +210,7 @@ function detect(): Lang {
   let query: string | null = null;
   if (typeof location !== "undefined") {
     query = new URLSearchParams(location.search).get("lang");
-    if (query === "en" || query === "vi") {
+    if (query === "en" || query === "vi" || query === "es") { // [fork:casa] + es
       try {
         localStorage.setItem("atelier-lang", query);
       } catch {
@@ -258,7 +262,7 @@ export function applyDom(root: ParentNode = document): void {
 
 export function toggleLang(): void {
   try {
-    localStorage.setItem("atelier-lang", LANG === "vi" ? "en" : "vi");
+    localStorage.setItem("atelier-lang", nextLang(LANG)); // [fork:casa] ciclo es → en → vi
   } catch {
     // ignore
   }
@@ -266,4 +270,9 @@ export function toggleLang(): void {
   const url = new URL(location.href);
   url.searchParams.delete("lang");
   location.href = url.toString();
+}
+
+/** [fork:casa] Orden del botón de idioma: es → en → vi → es. */
+export function nextLang(l: Lang): Lang {
+  return l === "es" ? "en" : l === "en" ? "vi" : "es";
 }

@@ -1,3 +1,4 @@
+import { translateText } from "../l10n/index.js"; // [fork:casa]
 import type { Point } from "@atelier/core";
 import { LAYERS, type Prim, type Scene2D } from "./scene.js";
 
@@ -171,7 +172,7 @@ function writePrim(
       g(10, prim.at[0]);
       g(20, prim.at[1]);
       g(40, prim.size * S); // mm giấy → mm model
-      g(1, prim.text);
+      g(1, translateText(prim.text)); // [fork:casa] l10n
       if (rot !== 0) g(50, rot);
       g(72, hAlign);
       g(73, 2); // middle — khớp dominant-baseline của SVG

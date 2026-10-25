@@ -1,4 +1,4 @@
-import { CATALOG, type Asset } from "@atelier/core";
+import { CATALOG, labelEs, type Asset } from "@atelier/core";
 import { LANG, t } from "./i18n.js";
 
 /**
@@ -61,7 +61,7 @@ export class CatalogPanel {
   private renderList(): void {
     const q = this.searchEl.value.trim().toLowerCase();
     const match = (a: Asset): boolean =>
-      !q || `${a.id} ${a.label} ${a.labelEn ?? ""} ${a.category}`.toLowerCase().includes(q);
+      !q || `${a.id} ${a.label} ${a.labelEn ?? ""} ${labelEs(a)} ${a.category}`.toLowerCase().includes(q); // [fork:casa] busca en español
     this.listEl.textContent = "";
     let count = 0;
     for (const a of CATALOG) {
@@ -72,7 +72,7 @@ export class CatalogPanel {
       btn.dataset.asset = a.id;
       const name = document.createElement("span");
       name.className = "cat-name";
-      name.textContent = LANG === "en" && a.labelEn ? a.labelEn : a.label;
+      name.textContent = LANG === "es" ? labelEs(a) : LANG === "en" && a.labelEn ? a.labelEn : a.label; // [fork:casa] + es
       const dims = document.createElement("span");
       dims.className = "cat-dims";
       dims.textContent = `${a.footprint.w}×${a.footprint.d}${a.mountHeight != null ? ` · ${t("catalog.mounted")}` : ""}`;

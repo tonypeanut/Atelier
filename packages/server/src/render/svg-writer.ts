@@ -1,3 +1,4 @@
+import { translateText } from "../l10n/index.js"; // [fork:casa]
 import type { Point } from "@atelier/core";
 import { LAYERS, type Prim, type Scene2D } from "./scene.js";
 import { PAPER, type PlanTransform } from "./transform.js";
@@ -123,7 +124,7 @@ function primToSvg(prim: Prim, map: (p: Point) => Point, tf: PlanTransform, isPa
       const anchor = prim.anchor ?? "start";
       const cls = prim.bold ? ` class="b"` : "";
       const tr = rot !== 0 ? ` transform="rotate(${F(rot)} ${F(at[0])} ${F(at[1])})"` : "";
-      return `<text x="${F(at[0])}" y="${F(at[1])}" font-size="${F(prim.size)}" text-anchor="${anchor}" dominant-baseline="middle"${cls}${tr}>${esc(prim.text)}</text>`;
+      return `<text x="${F(at[0])}" y="${F(at[1])}" font-size="${F(prim.size)}" text-anchor="${anchor}" dominant-baseline="middle"${cls}${tr}>${esc(translateText(prim.text))}</text>`; // [fork:casa] l10n
     }
     default:
       return null;

@@ -1,3 +1,4 @@
+import { serverLang } from "../l10n/index.js"; // [fork:casa]
 import { unverifiedRules, type Point } from "@atelier/core";
 import { PAPER } from "./transform.js";
 import { W, type LayerName, type Prim } from "./scene.js";
@@ -75,7 +76,7 @@ export function drawSheetFrame(push: FramePush, o: SheetFrameOptions): void {
       pts: [tip, [tip[0] - dir[0] * 3.4 + side[0], tip[1] - dir[1] * 3.4 + side[1]], [tip[0] - dir[0] * 3.4 - side[0], tip[1] - dir[1] * 3.4 - side[1]]],
       fill: "#000",
     }, undefined, "paper");
-    push("KHUNG", { kind: "text", at: [tip[0] + dir[0] * 3.4, tip[1] + dir[1] * 3.4], text: "B", size: 3, anchor: "middle", bold: true }, undefined, "paper");
+    push("KHUNG", { kind: "text", at: [tip[0] + dir[0] * 3.4, tip[1] + dir[1] * 3.4], text: serverLang() === "es" ? "N" : "B", size: 3, anchor: "middle", bold: true }, undefined, "paper"); // [fork:casa] norte
   }
 }
 

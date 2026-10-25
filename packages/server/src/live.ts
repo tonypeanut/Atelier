@@ -13,6 +13,7 @@ import {
   type CaptureCamera, type CaptureTarget, type ClientKind, type ServerMessage, type ValidationMsg,
 } from "@atelier/core";
 import { compareHtml, type VariantSide } from "./compare.js";
+import { translateCompareHtml, translateWsMessage } from "./l10n/index.js"; // [fork:casa]
 import { loadUnderlay } from "./import/underlay.js";
 import { renderPlanSvg } from "./render/render.js";
 import type { ProjectStore, StoreEvent } from "./store.js";
@@ -312,7 +313,7 @@ export class LiveServer {
         const b = side(c.req.query("b"), false);
         const level = c.req.query("level") ?? [...a.model.levels].sort((x, y) => x.elevation - y.elevation)[0]?.id;
         if (!level) return c.text("Model chưa có tầng nào.", 409);
-        return c.html(compareHtml(a, b, level, this.store.current.meta.name));
+        return c.html(translateCompareHtml(compareHtml(a, b, level, this.store.current.meta.name))); // [fork:casa] l10n
       } catch (e) {
         return c.text(e instanceof Error ? e.message : String(e), 404);
       }
@@ -498,11 +499,11 @@ export class LiveServer {
   }
 
   private send(peer: Peer, msg: ServerMessage): void {
-    if (peer.sock.readyState === peer.sock.OPEN) peer.sock.send(JSON.stringify(msg));
+    if (peer.sock.readyState === peer.sock.OPEN) peer.sock.send(JSON.stringify(translateWsMessage(msg))); // [fork:casa] l10n
   }
 
   private broadcast(msg: ServerMessage): void {
-    const raw = JSON.stringify(msg);
+    const raw = JSON.stringify(translateWsMessage(msg)); // [fork:casa] l10n
     for (const peer of this.peers) {
       if (peer.sock.readyState === peer.sock.OPEN) peer.sock.send(raw);
     }

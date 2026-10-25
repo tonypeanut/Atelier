@@ -3,6 +3,7 @@ export const CORE_VERSION = "0.1.0";
 export * from "./types.js";
 export * from "./ids.js";
 export * from "./catalog.js";
+export * from "./catalog-es.js"; // [fork:casa]
 export * from "./issues.js";
 export * from "./model.js";
 export {

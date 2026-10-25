@@ -1,4 +1,4 @@
-import { areaM2, getAsset, nextId, type EntityKind, type Op } from "@atelier/core";
+import { areaM2, getAsset, labelEs, nextId, type EntityKind, type Op } from "@atelier/core"; // [fork:casa] + labelEs
 import { AppState } from "./state.js";
 import { CatalogPanel } from "./catalog-panel.js";
 import { Plan2D } from "./plan2d.js";
@@ -6,7 +6,8 @@ import { Scene3D } from "./three3d.js";
 import { UI } from "./ui.js";
 import { WsClient } from "./ws.js";
 import { invertOps, UndoStack, type UndoEntry } from "./undo.js";
-import { applyDom, LANG, t, toggleLang } from "./i18n.js";
+import { applyDom, LANG, nextLang, t, toggleLang } from "./i18n.js";
+import { initLayers } from "./layers.js"; // [fork:casa]
 
 applyDom(); // áp từ điển lên chuỗi tĩnh trong index.html trước khi UI khởi động
 
@@ -105,7 +106,7 @@ const plan = new Plan2D(document.getElementById("paper-viewport")!, document.get
     const id = nextId(m, "F");
     sendOps(
       [{ op: "add", entity: "furniture", data: { id, level: state.activeLevel, asset: assetId, at, rotation: 0 } }],
-      t("note.place", { label: (LANG === "en" ? asset?.labelEn : undefined) ?? asset?.label ?? assetId }),
+      t("note.place", { label: (LANG === "es" && asset ? labelEs(asset) : LANG === "en" ? asset?.labelEn : undefined) ?? asset?.label ?? assetId }), // [fork:casa] + es
       "edit",
     );
     // giữ chế độ đặt — đặt liên tiếp tới khi Esc/V
@@ -113,6 +114,8 @@ const plan = new Plan2D(document.getElementById("paper-viewport")!, document.get
 });
 
 const scene3d = new Scene3D(document.getElementById("canvas3d") as HTMLCanvasElement);
+// [fork:casa] panel de capas 2D/3D + filtro por etapa
+initLayers({ paper: document.getElementById("paper")!, scene3d, getModel: () => state.model, lang: LANG });
 
 const ws = new WsClient({
   onConn: (s) => ui.setConn(s),
@@ -369,7 +372,7 @@ if (READONLY) {
 
 // nút đổi ngôn ngữ — hiện NGÔN NGỮ ĐÍCH, giữ nguyên trang (kể cả /xem/<token>)
 const langBtn = document.getElementById("lang-btn") as HTMLButtonElement;
-langBtn.textContent = LANG === "vi" ? "EN" : "VI";
+langBtn.textContent = nextLang(LANG).toUpperCase(); // [fork:casa] ES/EN/VI
 langBtn.addEventListener("click", toggleLang);
 
 ws.connect();

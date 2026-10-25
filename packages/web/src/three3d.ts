@@ -685,8 +685,18 @@ export class Scene3D {
   private setGroup(id: string, g: THREE.Group): void {
     this.removeGroup(id);
     g.name = id;
+    g.visible = this.visibleFn ? this.visibleFn(id) : true; // [fork:casa] capas / etapa
     this.groups.set(id, g);
     this.root.add(g);
+  }
+
+  // [fork:casa] filtro de visibilidad por entidad (lo maneja layers.ts)
+  private visibleFn: ((id: string) => boolean) | null = null;
+
+  setVisibilityFilter(fn: ((id: string) => boolean) | null): void {
+    this.visibleFn = fn;
+    for (const [id, g] of this.groups) g.visible = fn ? fn(id) : true;
+    this.invalidate();
   }
 
   private removeGroup(id: string): void {
